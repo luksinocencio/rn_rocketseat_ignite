@@ -9,11 +9,13 @@ import {
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 import Icon from 'react-native-vector-icons/dist/Entypo'
 
-type Props = TouchableOpacityProps & {}
+type Props = TouchableOpacityProps & {
+  onPress: () => void
+}
 
-export function ExerciseCard() {
+export function ExerciseCard({ onPress }: Props) {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onPress}>
       <HStack
         bg="gray.500"
         alignItems="center"
