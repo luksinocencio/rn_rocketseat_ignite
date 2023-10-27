@@ -12,7 +12,6 @@ import {
 } from 'native-base'
 import { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { launchImageLibrary } from 'react-native-image-picker'
 
 const PHOTO_SIZE = 33
 
@@ -22,31 +21,7 @@ export function Profile() {
     'https://gravatar.com/avatar/c8b50b95553604091c31454162752a35?s=400&d=robohash&r=x',
   )
 
-  async function handleUserPhotoSelect() {
-    try {
-      const options = {
-        mediaType: 'photo',
-        quality: 1,
-        aspectRatio: [4, 4],
-        includeBase64: false,
-      }
-
-      await launchImageLibrary(options, response => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker')
-        } else if (response.error) {
-          console.log('Image picker error: ', response.error)
-        } else {
-          let imageUri = response.uri || response.assets?.[0]?.uri
-          setUserPhoto(imageUri)
-        }
-      })
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setPhotIsLoading(false)
-    }
-  }
+  async function handleUserPhotoSelect() {}
 
   return (
     <VStack flex={1}>
