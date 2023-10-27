@@ -12,11 +12,41 @@ import {
 } from 'native-base'
 import { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
+import { launchImageLibrary } from 'react-native-image-picker'
 
 const PHOTO_SIZE = 33
 
 export function Profile() {
   const [photoIsLoading, setPhotIsLoading] = useState(true)
+  const [userPhoto, setUserPhoto] = useState(
+    'https://gravatar.com/avatar/c8b50b95553604091c31454162752a35?s=400&d=robohash&r=x',
+  )
+
+  async function handleUserPhotoSelect() {
+    try {
+      const options = {
+        mediaType: 'photo',
+        quality: 1,
+        aspectRatio: [4, 4],
+        includeBase64: false,
+      }
+
+      await launchImageLibrary(options, response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker')
+        } else if (response.error) {
+          console.log('Image picker error: ', response.error)
+        } else {
+          let imageUri = response.uri || response.assets?.[0]?.uri
+          setUserPhoto(imageUri)
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setPhotIsLoading(false)
+    }
+  }
 
   return (
     <VStack flex={1}>
@@ -34,13 +64,13 @@ export function Profile() {
           ) : (
             <UserPhoto
               source={{
-                uri: 'https://gravatar.com/avatar/c8b50b95553604091c31454162752a35?s=400&d=robohash&r=x',
+                uri: userPhoto,
               }}
               alt="Foto do usuário"
               size={PHOTO_SIZE}
             />
           )}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserPhotoSelect}>
             <Text
               color="green.500"
               fontWeight={'bold'}
