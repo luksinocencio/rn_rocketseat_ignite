@@ -8,15 +8,31 @@ import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesPros } from '@routes/auth.routes'
 
 import { useForm, Controller } from 'react-hook-form'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 type FormDataProps = {
   email: string
   password: string
 }
 
+const signInSchema = yup.object({
+  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
+  password: yup
+    .string()
+    .required('Senha obrigatório')
+    .min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+})
+
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesPros>()
-  const { control, handleSubmit } = useForm<FormDataProps>()
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(signInSchema),
+  })
 
   function handleNewAccount() {
     navigation.navigate('signUp')
@@ -66,6 +82,7 @@ export function SignIn() {
                 autoCorrect={false}
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.email?.message}
               />
             )}
           />
@@ -78,6 +95,7 @@ export function SignIn() {
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.password?.message}
               />
             )}
           />
