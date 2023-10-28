@@ -105,6 +105,7 @@ export function Profile() {
             fontSize="md"
             mb={2}
             alignSelf="flex-start"
+            fontFamily={'heading'}
             mt={12}>
             Alterar senha
           </Heading>
