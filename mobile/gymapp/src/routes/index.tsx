@@ -8,7 +8,6 @@ import { AuthContext } from '@contexts/AuthContext'
 export function Routes() {
   const { colors } = useTheme()
   const contextData = useContext(AuthContext)
-
   console.log(contextData)
 
   const theme = DefaultTheme
