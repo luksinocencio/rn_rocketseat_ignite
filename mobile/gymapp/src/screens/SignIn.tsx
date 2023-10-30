@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Image,
   VStack,
@@ -36,6 +36,7 @@ const signInSchema = yup.object({
 
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesPros>()
+  const [isLoading, setIsLoading] = useState(false)
   const { signIn } = useAuth()
   const toast = useToast()
   const {
@@ -52,6 +53,7 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormDataProps) {
     try {
+      setIsLoading(true)
       await signIn(email, password)
     } catch (err) {
       const isAppError = err instanceof AppError
@@ -59,11 +61,13 @@ export function SignIn() {
         ? err.message
         : 'Não foi possível entrar. Tente novamente.'
 
-      return toast.show({
+      toast.show({
         title,
         placement: 'top',
         bgColor: 'red.500',
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -124,7 +128,11 @@ export function SignIn() {
               />
             )}
           />
-          <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+          <Button
+            title="Acessar"
+            onPress={handleSubmit(handleSignIn)}
+            isLoading={isLoading}
+          />
         </Center>
 
         <Center mt={24}>
