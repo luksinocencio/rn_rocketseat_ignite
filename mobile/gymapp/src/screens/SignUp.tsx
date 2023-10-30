@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Image,
   VStack,
@@ -19,6 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '@services/api'
 import axios from 'axios'
 import { AppError } from '@utils/AppError'
+import { useAuth } from '@hooks/useAuth'
 
 type FormDataProps = {
   name: string
@@ -37,14 +38,11 @@ const signUpSchema = yup.object({
   password_confirm: yup
     .string()
     .required('Confirme sua senha.')
-    .oneOf([yup.ref('password'), null], 'A confirmação da senha não confere.'),
+    .oneOf([yup.ref('password')], 'A confirmação da senha não confere.'),
 })
 
 export function SignUp() {
-  // Valor inicial
-  // const { control, handleSubmit } = useForm<FormDataProps>({
-  //   defaultValues: { name: 'Lucas' },
-  // })
+  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const {
     control,
@@ -55,6 +53,7 @@ export function SignUp() {
   })
 
   const navigation = useNavigation()
+  const { signIn } = useAuth()
 
   function handleGoBack() {
     navigation.goBack()
@@ -67,21 +66,23 @@ export function SignUp() {
     password_confirm,
   }: FormDataProps) {
     try {
-      const response = await api.post('/users', { name, email, password })
-      console.log(response.data)
+      setIsLoading(true)
+      await api.post('/users', { name, email, password })
+      await signIn(email, password)
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const isAppError = error instanceof AppError
-        const title = isAppError
-          ? error.message
-          : 'Não foi possível criar conta. Tente novamente mais tarde.'
+      setIsLoading(false)
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível criar conta. Tente novamente mais tarde.'
 
-        toast.show({
-          title,
-          placement: 'top',
-          bgColor: 'red.500',
-        })
-      }
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -177,6 +178,7 @@ export function SignUp() {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isLoading}
           />
         </Center>
 
